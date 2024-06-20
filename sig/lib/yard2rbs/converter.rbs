@@ -1,0 +1,14 @@
+module Yard2rbs
+  class Converter
+    def initialize: (String input_path) -> void
+    def convert: () -> String
+    private
+    def process: (Prism::Node node) -> true
+    def validate: (String output) -> true
+    def output: (String str) -> String
+    def self?: (Prism::Node node) -> Boolean
+    def parse_comments: (Prism::Node node) -> Hash
+    def convert_types: (String types) -> Array[String]
+    def format_types: (Array[String] types) -> String
+  end
+end

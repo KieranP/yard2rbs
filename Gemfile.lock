@@ -1,15 +1,19 @@
 PATH
   remote: .
   specs:
-    yard2rbs (0.1.0)
+    yard2rbs (0.0.1)
       prism (~> 0.30.0)
+      rbs (~> 3.5.1)
 
 GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.5.1)
+    logger (1.6.0)
     prism (0.30.0)
     rake (13.2.1)
+    rbs (3.5.1)
+      logger
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
