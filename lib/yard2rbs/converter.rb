@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "prism"
+require "rbs"
 
 # https://ruby.github.io/prism/rb/index.html
 # https://github.com/ruby/rbs/blob/master/docs/syntax.md
@@ -211,41 +212,8 @@ module Yard2rbs
     # @param node [Prism::Node]
     # @return [Hash]
     def parse_comments(node)
-      params = {}
-      returns = []
-
-      comments = node.location.comments
-      comments&.each do |comment|
-        line = comment.slice
-
-        case line
-        when /@param/
-          if matches = line.match(/# @param ([^\s]+) \[([^\]]+)\].*/)
-            types = matches[2].split(',').map(&:strip)
-            params[matches[1]] = convert_types(types)
-          end
-        when /@return/
-          if matches = line.match(/# @return \[([^\]]+)\].*/)
-            types = matches[1].split(',').map(&:strip)
-            returns += convert_types(types)
-          end
-        end
-      end
-
-      {
-        params: params,
-        returns: returns,
-      }
-    end
-
-    # @param types [String]
-    # @return [Array<String>]
-    def convert_types(types)
-      types.map do |type|
-        type.
-          gsub(/Array\<([^>]+)\>/, 'Array[\1]').
-          gsub(/Hash\<([^>]+),\s*([^>]+)\>/, 'Hash[\1,\2]')
-      end
+      comments = node.location.comments.map(&:slice)
+      YardParser.parse(comments)
     end
 
     # @param types [Array<String>]

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    yard2rbs (0.0.1)
+    yard2rbs (0.0.2)
       prism (~> 0.30.0)
       rbs (~> 3.5.1)
 

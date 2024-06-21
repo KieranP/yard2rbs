@@ -8,7 +8,6 @@ module Yard2rbs
     def output: (String str) -> String
     def self?: (Prism::Node node) -> Boolean
     def parse_comments: (Prism::Node node) -> Hash
-    def convert_types: (String types) -> Array[String]
     def format_types: (Array[String] types) -> String
   end
 end

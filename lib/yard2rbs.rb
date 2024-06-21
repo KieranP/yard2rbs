@@ -1,17 +1,14 @@
 # frozen_string_literal: true
 
 require_relative "yard2rbs/converter"
+require_relative "yard2rbs/yard_parser"
 require_relative "yard2rbs/version"
-
-require "rbs"
 
 module Yard2rbs
   class << self
     # @param file_paths [Array<String>]
     # @return [Boolean]
     def convert(file_paths)
-      # TODO: Clear out rbs/ directory
-
       file_paths.each do |file_path|
         output = Converter.new(file_path).convert
         next if output.empty?
