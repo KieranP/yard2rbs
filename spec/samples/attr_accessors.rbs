@@ -1,0 +1,18 @@
+class Sample
+  attr_accessor email: String
+  attr_accessor first_name: String
+  attr_accessor last_name: String
+  attr_accessor roles: Array[String]
+  class NestedClass
+    attr_accessor email: String
+    attr_accessor first_name: String
+    attr_accessor last_name: String
+    attr_accessor roles: Array[String]
+  end
+  module NestedModule
+    attr_accessor email: String
+    attr_accessor first_name: String
+    attr_accessor last_name: String
+    attr_accessor roles: Array[String]
+  end
+end

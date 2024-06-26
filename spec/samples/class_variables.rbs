@@ -1,0 +1,12 @@
+class Sample
+  @@greeting: String
+  @@roles: Array[String]
+  class NestedClass
+    @@greeting: String
+    @@roles: Array[String]
+  end
+  module NestedModule
+    @@greeting: String
+    @@roles: Array[String]
+  end
+end

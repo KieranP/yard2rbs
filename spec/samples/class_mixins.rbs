@@ -1,0 +1,14 @@
+class Sample
+  prepend Mixable1
+  prepend Mixable2
+  extend Mixable1
+  extend Mixable2
+  include Mixable1
+  include Mixable2
+  module Mixable1
+    def greeting: () -> String
+  end
+  module Mixable2
+    def greeting: () -> String
+  end
+end

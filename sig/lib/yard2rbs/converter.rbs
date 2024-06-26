@@ -1,5 +1,6 @@
 module Yard2rbs
   class Converter
+    def self.convert: (String input_path) -> String
     def initialize: (String input_path) -> void
     def convert: () -> String
     private

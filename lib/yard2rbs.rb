@@ -10,7 +10,7 @@ module Yard2rbs
     # @return [Boolean]
     def convert(file_paths)
       file_paths.each do |file_path|
-        output = Converter.new(file_path).convert
+        output = Converter.convert(file_path)
         next if output.empty?
 
         input_dirname = File.dirname(file_path)

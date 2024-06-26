@@ -1,0 +1,8 @@
+class Sample
+  def greeting1a: () -> String
+  def greeting2a: () -> String
+  def greeting3a: () -> String
+  alias greeting1b greeting1a
+  alias greeting2b greeting2a
+  alias greeting3b greeting3a
+end

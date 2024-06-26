@@ -1,0 +1,18 @@
+class Sample
+  attr_reader email: String
+  attr_reader first_name: String
+  attr_reader last_name: String
+  attr_reader roles: Array[String]
+  class NestedClass
+    attr_reader email: String
+    attr_reader first_name: String
+    attr_reader last_name: String
+    attr_reader roles: Array[String]
+  end
+  module NestedModule
+    attr_reader email: String
+    attr_reader first_name: String
+    attr_reader last_name: String
+    attr_reader roles: Array[String]
+  end
+end

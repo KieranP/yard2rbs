@@ -1,0 +1,14 @@
+class Sample
+  class User
+    def greeting: () -> String
+    class Admin < ::Sample::User
+      def greeting: () -> String
+    end
+    class Superadmin < Admin
+      def greeting: () -> String
+    end
+  end
+  class Manager < User
+    def greeting: () -> String
+  end
+end

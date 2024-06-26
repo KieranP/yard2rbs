@@ -1,0 +1,12 @@
+class Sample
+  self.@greeting: String
+  self.@roles: Array[String]
+  class NestedClass
+    self.@greeting: String
+    self.@roles: Array[String]
+  end
+  module NestedModule
+    self.@greeting: String
+    self.@roles: Array[String]
+  end
+end

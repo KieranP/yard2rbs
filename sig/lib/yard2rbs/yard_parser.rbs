@@ -1,6 +1,6 @@
 module Yard2rbs
   class YardParser
-    def self.parse: (Array[String] comments) -> Hash
+    def self.parse: (Array[String] comments) -> Hash[Symbol, Array[String] | Hash[String, String]]
     def self.convert: (String types_str) -> Array[String]
   end
 end

@@ -1,13 +1,20 @@
 # frozen_string_literal: true
 
+# TODO:
+# * Convert YARD "Boolean" to RBS "bool"
+# * Make some classes top level via :: (e.g. String -> ::String)
+
 module Yard2rbs
   class YardParser
     class << self
       # @param comments [Array<String>]
-      # @return [Hash]
+      # @return [Hash<Symbol, Array<String> | Hash<String, String>>]
       def parse(comments)
         params = {}
         returns = []
+
+        yieldparams = {}
+        yieldreturns = []
 
         comments&.each do |comment|
           case comment
@@ -15,16 +22,30 @@ module Yard2rbs
             if matches = comment.match(/# @param ([^\s]+) \[([^\]]+)\].*/)
               params[matches[1]] = convert(matches[2])
             end
+
           when /@return/
             if matches = comment.match(/# @return \[([^\]]+)\].*/)
               returns += convert(matches[1])
+            end
+
+          when /@yieldparam/
+            if matches = comment.match(/# @yieldparam ([^\s]+) \[([^\]]+)\].*/)
+              yieldparams[matches[1]] = convert(matches[2])
+            end
+
+          when /@yieldreturn/
+            if matches = comment.match(/# @yieldreturn \[([^\]]+)\].*/)
+              yieldreturns += convert(matches[1])
             end
           end
         end
 
         {
-          params: params,
-          returns: returns,
+          params:,
+          returns:,
+
+          yieldparams:,
+          yieldreturns:,
         }
       end
 

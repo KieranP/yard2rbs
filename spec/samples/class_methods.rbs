@@ -1,0 +1,31 @@
+class Sample
+  def self.greeting: () -> String
+  def self.greet1: (String name) -> String
+  def self.greet2: (String first_name, String last_name) -> String
+  def self.greet3: (?String greeting) -> String
+  def self.greet4: (String first_name, String last_name, ?String greeting) -> String
+  def self.greet5: (*String) -> String
+  def self.greet6: (name: String) -> String
+  def self.greet7: (first_name: String, last_name: String) -> String
+  def self.greet8: (?greeting: String) -> String
+  def self.greet9: (first_name: String, last_name: String, ?greeting: String) -> String
+  def self.greet10: (**String) -> Array[String]
+  def self.greet11: (String first_name, String last_name, String greeting) { (String greeting) -> String } -> String
+  private def self.private_greeting: () -> String
+  private
+  def self.private_greet: (String name) -> String
+  class NestedClass
+    def self.greeting: () -> String
+    def self.greet: (String name) -> String
+    private def self.private_greeting: () -> String
+    private
+    def self.private_greet: (String name) -> String
+  end
+  module NestedModule
+    def self.greeting: () -> String
+    def self.greet: (String name) -> String
+    private def self.private_greeting: () -> String
+    private
+    def self.private_greet: (String name) -> String
+  end
+end

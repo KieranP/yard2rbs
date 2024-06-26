@@ -6,9 +6,18 @@ require "rbs"
 # https://ruby.github.io/prism/rb/index.html
 # https://github.com/ruby/rbs/blob/master/docs/syntax.md
 # https://github.com/ruby/rbs/blob/master/lib/rbs/prototype/rb.rb
+# https://rubydoc.info/gems/yard/file/docs/GettingStarted.md
 
 module Yard2rbs
   class Converter
+    class << self
+      # @param input_path [String]
+      # @return [String]
+      def convert(input_path)
+        new(input_path).convert
+      end
+    end
+
     # @param input_path [String]
     # @return [void]
     def initialize(input_path)
@@ -20,6 +29,7 @@ module Yard2rbs
     # @return [String]
     def convert
       @_indent_level = 0
+      @_superclasses = []
       # puts @parse_result.value.inspect
       process(@parse_result.value)
       output = @output.join("\n")
@@ -40,12 +50,20 @@ module Yard2rbs
 
       when Prism::ClassNode
         if node.superclass
-          output("class #{node.constant_path.name} < #{node.superclass.name}")
+          case node.superclass
+          when Prism::SelfNode
+            output("class #{node.constant_path.name} < ::#{@_superclasses.join("::")}")
+          else
+            output("class #{node.constant_path.name} < #{node.superclass.name}")
+          end
         else
           output("class #{node.constant_path.name}")
         end
+
         @_indent_level += 1
+        @_superclasses << node.constant_path.name
         process(node.compact_child_nodes)
+        @_superclasses.pop
         @_indent_level -= 1
         output("end")
 
@@ -57,7 +75,9 @@ module Yard2rbs
       when Prism::ModuleNode
         output("module #{node.constant_path.name}")
         @_indent_level += 1
+        @_superclasses << node.constant_path.name
         process(node.compact_child_nodes)
+        @_superclasses.pop
         @_indent_level -= 1
         output("end")
 
@@ -67,10 +87,14 @@ module Yard2rbs
         output("#{node.name}: #{type}")
 
       when Prism::ClassVariableWriteNode
-        output("#{node.name}: untyped")
+        types = parse_comments(node)
+        type = format_types(types[:returns])
+        output("#{node.name}: #{type}")
 
       when Prism::InstanceVariableWriteNode
-        output("self.#{node.name}: untyped")
+        types = parse_comments(node)
+        type = format_types(types[:returns])
+        output("self.#{node.name}: #{type}")
 
       when Prism::DefNode
         visibility = @_visibility_node&.name
@@ -97,7 +121,7 @@ module Yard2rbs
 
           if arg = node.parameters.rest
             type = format_types(types[:params][arg.name.to_s])
-            params << "*#{type} #{arg.name}"
+            params << "*#{type}"
           end
 
           if node.parameters.keywords
@@ -113,11 +137,19 @@ module Yard2rbs
 
           if arg = node.parameters.keyword_rest
             type = format_types(types[:params][arg.name.to_s])
-            params << "**#{type} #{arg.name}"
+            params << "**#{type}"
           end
 
           if arg = node.parameters.block
-            block = "{ (?) -> untyped }"
+            yieldparams =
+              types[:yieldparams].map do |name, types|
+                type = format_types(types)
+                "#{type} #{name}"
+              end
+
+            return_type = format_types(types[:yieldreturns])
+
+            block = "{ (#{yieldparams.join(", ")}) -> #{return_type} }"
           end
         end
 
@@ -149,10 +181,12 @@ module Yard2rbs
         when :attr_accessor, :attr_reader, :attr_writer
           if node.arguments
             receiver = "self." if self?(node)
+            types = parse_comments(node)
+            type = format_types(types[:returns])
             node.arguments.arguments.each do |arg|
               output([
                 "#{receiver}#{node.name}",
-                "#{arg.unescaped}: untyped"
+                "#{arg.unescaped}: #{type}"
               ].compact.join(' '))
             end
           end
