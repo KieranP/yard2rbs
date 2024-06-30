@@ -2,6 +2,7 @@
 
 require "prism"
 require "rbs"
+require "fileutils"
 
 # https://ruby.github.io/prism/rb/index.html
 # https://github.com/ruby/rbs/blob/master/docs/syntax.md
@@ -39,7 +40,7 @@ module Yard2rbs
 
     private
 
-    # @param node [Prism::Node]
+    # @param node [Prism::Node, Array<Prism::Node>]
     # @return [true]
     def process(node)
       case node
@@ -244,13 +245,13 @@ module Yard2rbs
     end
 
     # @param node [Prism::Node]
-    # @return [Hash]
+    # @return [Hash{Symbol => Array<String>, Hash<String, String>}]
     def parse_comments(node)
       comments = node.location.comments.map(&:slice)
       YardParser.parse(comments)
     end
 
-    # @param types [Array<String>]
+    # @param types [Array<String>, nil]
     # @return [String]
     def format_types(types)
       return 'untyped' if !types || types.size == 0

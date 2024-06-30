@@ -1,14 +1,13 @@
 # frozen_string_literal: true
 
 # TODO:
-# * Convert YARD "Boolean" to RBS "bool"
 # * Make some classes top level via :: (e.g. String -> ::String)
 
 module Yard2rbs
   class YardParser
     class << self
       # @param comments [Array<String>]
-      # @return [Hash<Symbol, Array<String> | Hash<String, String>>]
+      # @return [Hash{Symbol => Array<String>, Hash<String, String>}]
       def parse(comments)
         params = {}
         returns = []
@@ -57,38 +56,92 @@ module Yard2rbs
       # @return [Array<String>]
       def convert(types_str)
         types = []
+        context_stack = []
+        current_type_chars = []
+        current_word_chars = []
 
-        nested_level = 0
-        current_type = []
+        types_str = types_str.tr(' ', '')
         types_str.each_char.with_index(1) do |char, index|
           case char
           when ','
-            if nested_level > 0
-              current_type << char
-            else
-              types << current_type.join
-              current_type = []
+            current_type_chars += mutate(current_word_chars)
+            current_word_chars = []
+
+            case context_stack.last
+            when 'Hash', 'Tuple'
+              current_type_chars << ', '
+            when 'Array', 'HashComplex'
+              current_type_chars << ' | '
+            when nil
+              types << current_type_chars.join
+              current_type_chars = []
             end
+
           when '<'
-            nested_level += 1
-            current_type << "["
+            context_stack << current_word_chars.join
+            current_type_chars += mutate(current_word_chars)
+            current_word_chars = []
+            current_type_chars << "["
+
           when '>'
-            nested_level -= 1
-            current_type << "]"
-          when ' '
-            if current_type.any?
-              current_type << " "
+            if context_stack.last == 'HashComplex'
+              current_word_chars.pop
+              current_type_chars += mutate(current_word_chars)
+              current_word_chars = []
+              current_type_chars << ", "
+            else
+              context_stack.pop
+              current_type_chars += mutate(current_word_chars)
+              current_word_chars = []
+              current_type_chars << "]"
             end
+
+          when '('
+            context_stack << 'Tuple'
+            current_word_chars = []
+            current_type_chars << "["
+
+          when ')'
+            context_stack.pop
+            current_type_chars += mutate(current_word_chars)
+            current_word_chars = []
+            current_type_chars << "]"
+
+          when '{'
+            context_stack << 'HashComplex'
+            current_type_chars += mutate(current_word_chars)
+            current_word_chars = []
+            current_type_chars << "["
+
+          when '}'
+            context_stack.pop
+            current_type_chars += mutate(current_word_chars)
+            current_word_chars = []
+            current_type_chars << "]"
+
           else
-            current_type << char
+            current_word_chars << char
           end
 
           if index == types_str.size
-            types << current_type.join
+            current_type_chars += mutate(current_word_chars)
+            types << current_type_chars.join
+            current_type_chars = []
           end
         end
 
         types
+      end
+
+      # @param type [Array<String>]
+      # @return [Array<String>]
+      def mutate(chars)
+        case chars.join
+        when 'Boolean'
+          'bool'.split
+        else
+          chars
+        end
       end
     end
   end

@@ -4,11 +4,11 @@ module Yard2rbs
     def initialize: (String input_path) -> void
     def convert: () -> String
     private
-    def process: (Prism::Node node) -> true
+    def process: ((Prism::Node | Array[Prism::Node]) node) -> true
     def validate: (String output) -> true
     def output: (String str) -> String
-    def self?: (Prism::Node node) -> Boolean
-    def parse_comments: (Prism::Node node) -> Hash
-    def format_types: (Array[String] types) -> String
+    def self?: (Prism::Node node) -> bool
+    def parse_comments: (Prism::Node node) -> Hash[Symbol, Array[String] | Hash[String, String]]
+    def format_types: (Array[String]? types) -> String
   end
 end
