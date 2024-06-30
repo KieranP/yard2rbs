@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "prism"
-require "rbs"
-require "fileutils"
+require 'prism'
+require 'rbs'
+require 'fileutils'
 
 # https://ruby.github.io/prism/rb/index.html
 # https://github.com/ruby/rbs/blob/master/docs/syntax.md
@@ -53,7 +53,7 @@ module Yard2rbs
         if node.superclass
           case node.superclass
           when Prism::SelfNode
-            output("class #{node.constant_path.name} < ::#{@_superclasses.join("::")}")
+            output("class #{node.constant_path.name} < ::#{@_superclasses.join('::')}")
           else
             output("class #{node.constant_path.name} < #{node.superclass.name}")
           end
@@ -66,7 +66,7 @@ module Yard2rbs
         process(node.compact_child_nodes)
         @_superclasses.pop
         @_indent_level -= 1
-        output("end")
+        output('end')
 
       when Prism::SingletonClassNode
         @_within_singleton = true
@@ -80,7 +80,7 @@ module Yard2rbs
         process(node.compact_child_nodes)
         @_superclasses.pop
         @_indent_level -= 1
-        output("end")
+        output('end')
 
       when Prism::ConstantWriteNode
         types = parse_comments(node)
@@ -99,75 +99,70 @@ module Yard2rbs
 
       when Prism::DefNode
         visibility = @_visibility_node&.name
-        receiver = "self." if self?(node)
+        visibility = 'private' if visibility == :private_class_method
+
+        receiver = 'self.' if self?(node)
 
         types = parse_comments(@_visibility_node || node)
         params = []
         block = nil
 
-        if node.parameters
-          if node.parameters.requireds
-            node.parameters.requireds.each do |arg|
-              type = format_types(types[:params][arg.name.to_s])
-              params << "#{type} #{arg.name}"
+        node.parameters&.requireds&.each do |arg|
+          type = format_types(types[:params][arg.name.to_s])
+          params << "#{type} #{arg.name}"
+        end
+
+        node.parameters&.optionals&.each do |arg|
+          type = format_types(types[:params][arg.name.to_s])
+          params << "?#{type} #{arg.name}"
+        end
+
+        if (rest_arg = node.parameters&.rest)
+          type = format_types(types[:params][rest_arg.name.to_s])
+          params << "*#{type}"
+        end
+
+        node.parameters&.keywords&.each do |arg|
+          type = format_types(types[:params][arg.name.to_s])
+          params <<
+            if arg.is_a?(Prism::OptionalKeywordParameterNode)
+              "?#{arg.name}: #{type}"
+            else
+              "#{arg.name}: #{type}"
             end
-          end
+        end
 
-          if node.parameters.optionals
-            node.parameters.optionals.each do |arg|
-              type = format_types(types[:params][arg.name.to_s])
-              params << "?#{type} #{arg.name}"
+        if (kw_rest_arg = node.parameters&.keyword_rest)
+          type = format_types(types[:params][kw_rest_arg.name.to_s])
+          params << "**#{type}"
+        end
+
+        if node.parameters&.block
+          yieldparams =
+            types[:yieldparams].map do |name, yield_types|
+              type = format_types(yield_types)
+              "#{type} #{name}"
             end
-          end
 
-          if arg = node.parameters.rest
-            type = format_types(types[:params][arg.name.to_s])
-            params << "*#{type}"
-          end
+          return_type = format_types(types[:yieldreturns])
 
-          if node.parameters.keywords
-            node.parameters.keywords.each do |arg|
-              type = format_types(types[:params][arg.name.to_s])
-              if arg.is_a?(Prism::OptionalKeywordParameterNode)
-                params << "?#{arg.name}: #{type}"
-              else
-                params << "#{arg.name}: #{type}"
-              end
-            end
-          end
-
-          if arg = node.parameters.keyword_rest
-            type = format_types(types[:params][arg.name.to_s])
-            params << "**#{type}"
-          end
-
-          if arg = node.parameters.block
-            yieldparams =
-              types[:yieldparams].map do |name, types|
-                type = format_types(types)
-                "#{type} #{name}"
-              end
-
-            return_type = format_types(types[:yieldreturns])
-
-            block = "{ (#{yieldparams.join(", ")}) -> #{return_type} }"
-          end
+          block = "{ (#{yieldparams.join(', ')}) -> #{return_type} }"
         end
 
         return_type = format_types(types[:returns])
 
         output([
           visibility,
-          "def",
+          'def',
           "#{receiver}#{node.name}:",
-          "(#{params.join(", ")})",
+          "(#{params.join(', ')})",
           block,
           "-> #{return_type}"
         ].compact.join(' '))
 
       when Prism::CallNode
         case node.name
-        when :public, :private
+        when :public, :private, :private_class_method
           if node.arguments
             @_visibility_node = node
             node.arguments.arguments.each do |inner_node|
@@ -175,13 +170,12 @@ module Yard2rbs
             end
             @_visibility_node = nil
           else
-            receiver = "self." if self?(node)
-            output("#{receiver}#{node.name}")
+            output(node.name.to_s)
           end
 
         when :attr_accessor, :attr_reader, :attr_writer
           if node.arguments
-            receiver = "self." if self?(node)
+            receiver = 'self.' if self?(node)
             types = parse_comments(node)
             type = format_types(types[:returns])
             node.arguments.arguments.each do |arg|
@@ -194,7 +188,7 @@ module Yard2rbs
 
         when :extend, :prepend, :include
           if node.arguments
-            receiver = "self." if self?(node)
+            receiver = 'self.' if self?(node)
             node.arguments.arguments.each do |arg|
               output("#{receiver}#{node.name} #{arg.name}")
             end
@@ -234,7 +228,7 @@ module Yard2rbs
     # @param str [String]
     # @return [String]
     def output(str)
-      @output << ("  " * @_indent_level) + str
+      @output << (('  ' * @_indent_level) + str)
     end
 
     # @param node [Prism::Node]
@@ -254,7 +248,7 @@ module Yard2rbs
     # @param types [Array<String>, nil]
     # @return [String]
     def format_types(types)
-      return 'untyped' if !types || types.size == 0
+      return 'untyped' if !types || types.empty?
 
       nilable = true if types.delete('nil')
 

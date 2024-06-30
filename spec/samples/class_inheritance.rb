@@ -1,21 +1,23 @@
+# frozen_string_literal: true
+
 class Sample
   class User
     # @return [String]
     def greeting
-      "Hello"
+      'Hello'
     end
 
     class Admin < self
       # @return [String]
       def greeting
-        "Hello"
+        'Hello'
       end
     end
 
     class Superadmin < Admin
       # @return [String]
       def greeting
-        "Hello"
+        'Hello'
       end
     end
   end
@@ -23,7 +25,7 @@ class Sample
   class Manager < User
     # @return [String]
     def greeting
-      "Hello"
+      'Hello'
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Sample
   # @return [String]
   attr_accessor :email

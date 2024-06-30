@@ -1,8 +1,10 @@
-target :app do
-  check "lib"
-  signature "sig"
+# frozen_string_literal: true
 
-  library "prism"
-  library "rbs"
-  library "fileutils"
+target :app do
+  check 'lib'
+  signature 'sig'
+
+  library 'prism'
+  library 'rbs'
+  library 'fileutils'
 end

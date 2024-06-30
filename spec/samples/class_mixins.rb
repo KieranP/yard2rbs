@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+# rubocop:disable Style/MixinGrouping
+
 class Sample
   prepend Mixable1, Mixable2
   extend Mixable1, Mixable2
@@ -6,14 +10,16 @@ class Sample
   module Mixable1
     # @return [String]
     def greeting
-      "Hello"
+      'Hello'
     end
   end
 
   module Mixable2
     # @return [String]
     def greeting
-      "Hello"
+      'Hello'
     end
   end
 end
+
+# rubocop:enable Style/MixinGrouping

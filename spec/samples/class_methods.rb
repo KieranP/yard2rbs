@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 class Sample
   # @return [String]
   def self.greeting
-    "Hello"
+    'Hello'
   end
 
   # @param name [String]
@@ -19,7 +21,7 @@ class Sample
 
   # @param greeting [String]
   # @return [String]
-  def self.greet3(greeting = "Hello")
+  def self.greet3(greeting = 'Hello')
     greeting
   end
 
@@ -27,7 +29,7 @@ class Sample
   # @param last_name [String]
   # @param greeting [String]
   # @return [String]
-  def self.greet4(first_name, last_name, greeting = "Hello")
+  def self.greet4(first_name, last_name, greeting = 'Hello')
     "#{greeting} #{first_name} #{last_name}"
   end
 
@@ -52,7 +54,7 @@ class Sample
 
   # @param greeting [String]
   # @return [String]
-  def self.greet8(greeting: "Hello")
+  def self.greet8(greeting: 'Hello')
     greeting
   end
 
@@ -60,14 +62,14 @@ class Sample
   # @param last_name [String]
   # @param greeting [String]
   # @return [String]
-  def self.greet9(first_name:, last_name:, greeting: "Hello")
+  def self.greet9(first_name:, last_name:, greeting: 'Hello')
     "#{greeting} #{first_name} #{last_name}"
   end
 
   # @param args [String]
   # @return [Array<String>]
   def self.greet10(**args)
-    args.map { |k,v| "#{v} #{k}" }
+    args.map { |k, v| "#{v} #{k}" }
   end
 
   # @param first_name [String]
@@ -76,27 +78,29 @@ class Sample
   # @yieldparam greeting [String]
   # @yieldreturn [String]
   # @return [String]
-  def self.greet11(first_name, last_name, greeting, &block)
-    yield(f"#{greeting} #{first_name} #{last_name}")
+  def self.greet11(first_name, last_name, greeting, &)
+    yield("#{greeting} #{first_name} #{last_name}")
   end
 
   # @return [String]
-  private def self.private_greeting
-    "Yo"
+  private_class_method def self.private_greeting
+    'Yo'
   end
 
-  private
+  class << self
+    private
 
-  # @param name [String]
-  # @return [String]
-  def self.private_greet(name)
-    "Hello #{name}"
+    # @param name [String]
+    # @return [String]
+    def private_greet(name)
+      "Hello #{name}"
+    end
   end
 
   class NestedClass
     # @return [String]
     def self.greeting
-      "Hello"
+      'Hello'
     end
 
     # @param name [String]
@@ -106,23 +110,25 @@ class Sample
     end
 
     # @return [String]
-    private def self.private_greeting
-      "Yo"
+    private_class_method def self.private_greeting
+      'Yo'
     end
 
-    private
+    class << self
+      private
 
-    # @param name [String]
-    # @return [String]
-    def self.private_greet(name)
-      "Hello #{name}"
+      # @param name [String]
+      # @return [String]
+      def private_greet(name)
+        "Hello #{name}"
+      end
     end
   end
 
   module NestedModule
     # @return [String]
     def self.greeting
-      "Hello"
+      'Hello'
     end
 
     # @param name [String]
@@ -132,16 +138,18 @@ class Sample
     end
 
     # @return [String]
-    private def self.private_greeting
-      "Yo"
+    private_class_method def self.private_greeting
+      'Yo'
     end
 
-    private
+    class << self
+      private
 
-    # @param name [String]
-    # @return [String]
-    def self.private_greet(name)
-      "Hello #{name}"
+      # @param name [String]
+      # @return [String]
+      def private_greet(name)
+        "Hello #{name}"
+      end
     end
   end
 end

@@ -1,20 +1,26 @@
+# frozen_string_literal: true
+
+# rubocop:disable Style/Alias
+
 class Sample
   # @return [String]
   def greeting1a
-    "Hello!"
+    'Hello'
   end
 
   # @return [String]
   def greeting2a
-    "Greetings!"
+    'Greetings'
   end
 
   # @return [String]
   def greeting3a
-    "Welcome!"
+    'Welcome'
   end
 
   alias_method :greeting1b, :greeting1a
   alias :greeting2b :greeting2a
   alias greeting3b greeting3a
 end
+
+# rubocop:enable Style/Alias

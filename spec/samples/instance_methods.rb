@@ -1,7 +1,11 @@
+# frozen_string_literal: true
+
+# rubocop:disable Style/AccessModifierDeclarations
+
 class Sample
   # @return [String]
   def greeting
-    "Hello"
+    'Hello'
   end
 
   # @param name [String]
@@ -19,7 +23,7 @@ class Sample
 
   # @param greeting [String]
   # @return [String]
-  def greet3(greeting = "Hello")
+  def greet3(greeting = 'Hello')
     greeting
   end
 
@@ -27,7 +31,7 @@ class Sample
   # @param last_name [String]
   # @param greeting [String]
   # @return [String]
-  def greet4(first_name, last_name, greeting = "Hello")
+  def greet4(first_name, last_name, greeting = 'Hello')
     "#{greeting} #{first_name} #{last_name}"
   end
 
@@ -52,7 +56,7 @@ class Sample
 
   # @param greeting [String]
   # @return [String]
-  def greet8(greeting: "Hello")
+  def greet8(greeting: 'Hello')
     greeting
   end
 
@@ -60,14 +64,14 @@ class Sample
   # @param last_name [String]
   # @param greeting [String]
   # @return [String]
-  def greet9(first_name:, last_name:, greeting: "Hello")
+  def greet9(first_name:, last_name:, greeting: 'Hello')
     "#{greeting} #{first_name} #{last_name}"
   end
 
   # @param args [String]
   # @return [Array<String>]
   def greet10(**args)
-    args.map { |k,v| "#{v} #{k}" }
+    args.map { |k, v| "#{v} #{k}" }
   end
 
   # @param first_name [String]
@@ -76,13 +80,13 @@ class Sample
   # @yieldparam greeting [String]
   # @yieldreturn [String]
   # @return [String]
-  def greet11(first_name, last_name, greeting, &block)
-    yield(f"#{greeting} #{first_name} #{last_name}")
+  def greet11(first_name, last_name, greeting, &)
+    yield("#{greeting} #{first_name} #{last_name}")
   end
 
   # @return [String]
   private def private_greeting
-    "Yo"
+    'Yo'
   end
 
   private
@@ -96,7 +100,7 @@ class Sample
   class NestedClass
     # @return [String]
     def greeting
-      "Hello"
+      'Hello'
     end
 
     # @param name [String]
@@ -107,7 +111,7 @@ class Sample
 
     # @return [String]
     private def private_greeting
-      "Yo"
+      'Yo'
     end
 
     private
@@ -122,7 +126,7 @@ class Sample
   module NestedModule
     # @return [String]
     def greeting
-      "Hello"
+      'Hello'
     end
 
     # @param name [String]
@@ -133,7 +137,7 @@ class Sample
 
     # @return [String]
     private def private_greeting
-      "Yo"
+      'Yo'
     end
 
     private
@@ -145,3 +149,5 @@ class Sample
     end
   end
 end
+
+# rubocop:enable Style/AccessModifierDeclarations

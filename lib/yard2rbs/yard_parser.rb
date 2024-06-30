@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-# TODO:
-# * Make some classes top level via :: (e.g. String -> ::String)
+# TODO: Make some classes top level via :: (e.g. String -> ::String)
 
 module Yard2rbs
   class YardParser
@@ -18,24 +17,20 @@ module Yard2rbs
         comments&.each do |comment|
           case comment
           when /@param/
-            if matches = comment.match(/# @param ([^\s]+) \[([^\]]+)\].*/)
-              params[matches[1]] = convert(matches[2])
-            end
+            matches = comment.match(/# @param ([^\s]+) \[([^\]]+)\].*/)
+            params[matches[1]] = convert(matches[2]) if matches
 
           when /@return/
-            if matches = comment.match(/# @return \[([^\]]+)\].*/)
-              returns += convert(matches[1])
-            end
+            matches = comment.match(/# @return \[([^\]]+)\].*/)
+            returns += convert(matches[1]) if matches
 
           when /@yieldparam/
-            if matches = comment.match(/# @yieldparam ([^\s]+) \[([^\]]+)\].*/)
-              yieldparams[matches[1]] = convert(matches[2])
-            end
+            matches = comment.match(/# @yieldparam ([^\s]+) \[([^\]]+)\].*/)
+            yieldparams[matches[1]] = convert(matches[2]) if matches
 
           when /@yieldreturn/
-            if matches = comment.match(/# @yieldreturn \[([^\]]+)\].*/)
-              yieldreturns += convert(matches[1])
-            end
+            matches = comment.match(/# @yieldreturn \[([^\]]+)\].*/)
+            yieldreturns += convert(matches[1]) if matches
           end
         end
 
@@ -44,13 +39,13 @@ module Yard2rbs
           returns:,
 
           yieldparams:,
-          yieldreturns:,
+          yieldreturns:
         }
       end
 
       # Converts YARD type string into RBS type array
-      # e.g. Input:  "String, Array<String>, Hash<String, String>"
-      #      Output: ["String", "Array[String]", "Hash[String, String]"]
+      # e.g. Input:  'String, Array<String>, Hash<String, String>'
+      #      Output: ['String', 'Array[String]', 'Hash[String, String]']
       #
       # @param types_str [String]
       # @return [Array<String>]
@@ -81,43 +76,43 @@ module Yard2rbs
             context_stack << current_word_chars.join
             current_type_chars += mutate(current_word_chars)
             current_word_chars = []
-            current_type_chars << "["
+            current_type_chars << '['
 
           when '>'
             if context_stack.last == 'HashComplex'
               current_word_chars.pop
               current_type_chars += mutate(current_word_chars)
               current_word_chars = []
-              current_type_chars << ", "
+              current_type_chars << ', '
             else
               context_stack.pop
               current_type_chars += mutate(current_word_chars)
               current_word_chars = []
-              current_type_chars << "]"
+              current_type_chars << ']'
             end
 
           when '('
             context_stack << 'Tuple'
             current_word_chars = []
-            current_type_chars << "["
+            current_type_chars << '['
 
           when ')'
             context_stack.pop
             current_type_chars += mutate(current_word_chars)
             current_word_chars = []
-            current_type_chars << "]"
+            current_type_chars << ']'
 
           when '{'
             context_stack << 'HashComplex'
             current_type_chars += mutate(current_word_chars)
             current_word_chars = []
-            current_type_chars << "["
+            current_type_chars << '['
 
           when '}'
             context_stack.pop
             current_type_chars += mutate(current_word_chars)
             current_word_chars = []
-            current_type_chars << "]"
+            current_type_chars << ']'
 
           else
             current_word_chars << char
