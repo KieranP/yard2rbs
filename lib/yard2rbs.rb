@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'listen'
+
 require_relative 'yard2rbs/converter'
 require_relative 'yard2rbs/yard_parser'
 require_relative 'yard2rbs/version'
@@ -13,12 +15,8 @@ module Yard2rbs
         output = Converter.convert(file_path)
         next if output.empty?
 
-        input_dirname = File.dirname(file_path)
-        input_filename = File.basename(file_path, '.*')
-
-        output_dirname = File.join('sig', input_dirname)
-        output_filename = "#{input_filename}.rbs"
-        output_path = File.join(output_dirname, output_filename)
+        output_path = sig_path_for(file_path)
+        output_dirname = File.dirname(output_path)
 
         FileUtils.mkdir_p(output_dirname)
         File.open(output_path, 'w+') do |file|
@@ -27,6 +25,40 @@ module Yard2rbs
       end
 
       true
+    end
+
+    # @param dir_paths [Array<String>]
+    # @return [void]
+    def watch(dir_paths)
+      listener = Listen.to(
+        *dir_paths,
+        relative: true,
+        only: /\.rb$/
+      ) do |modified, added, removed|
+        convert(added + modified)
+
+        removed.each do |file_path|
+          output_path = sig_path_for(file_path)
+          next unless File.exist?(output_path)
+
+          File.delete(output_path)
+        end
+      end
+      listener.start
+      sleep
+    end
+
+    private
+
+    # @param file_path [String]
+    # @return [String]
+    def sig_path_for(file_path)
+      input_dirname = File.dirname(file_path)
+      input_filename = File.basename(file_path, '.*')
+
+      output_dirname = File.join('sig', input_dirname)
+      output_filename = "#{input_filename}.rbs"
+      File.join(output_dirname, output_filename)
     end
   end
 end

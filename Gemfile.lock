@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     yard2rbs (0.0.3)
+      listen (~> 3.9.0)
       prism (~> 0.30.0)
       rbs (~> 3.5.1)
 

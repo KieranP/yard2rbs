@@ -1,3 +1,6 @@
 module Yard2rbs
   def self.convert: (Array[String] file_paths) -> bool
+  def self.watch: (Array[String] dir_paths) -> void
+  private
+  def self.sig_path_for: (String file_path) -> String
 end

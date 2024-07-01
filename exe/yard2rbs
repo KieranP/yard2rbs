@@ -4,4 +4,20 @@
 require 'bundler/setup'
 require 'yard2rbs'
 
-Yard2rbs.convert(ARGV)
+case ARGV.first
+when 'convert'
+  Yard2rbs.convert(ARGV[1..])
+when 'watch'
+  Yard2rbs.watch(ARGV[1..])
+else
+  puts <<~HELP
+    yard2rbs
+
+    Usage:
+      yard2rbs convert [FILES]
+        e.g. yard2rbs convert lib/**/*.rb
+
+      yard2rbs watch [DIRS]
+        e.g. yard2rbs watch lib/
+  HELP
+end
