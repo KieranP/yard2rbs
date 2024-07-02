@@ -13,9 +13,17 @@ module Yard2rbs
   class Converter
     class << self
       # @param input_path [String]
+      # @param validate [Boolean]
       # @return [String]
-      def convert(input_path)
-        new(input_path).convert
+      def convert(input_path, validate: true)
+        new(input_path).convert(validate:)
+      end
+
+      # @param input [String]
+      # @return [true]
+      def validate(input)
+        RBS::Parser.parse_signature(input)
+        true
       end
     end
 
@@ -27,14 +35,15 @@ module Yard2rbs
       @output = []
     end
 
+    # @param validate [Boolean]
     # @return [String]
-    def convert
+    def convert(validate: true)
       @_indent_level = 0
       @_superclasses = []
       # puts @parse_result.value.inspect
       process(@parse_result.value)
       output = @output.join("\n")
-      validate(output)
+      Converter.validate(output) if validate
       output
     end
 
@@ -55,7 +64,8 @@ module Yard2rbs
           when Prism::SelfNode
             output("class #{node.constant_path.name} < ::#{@_superclasses.join('::')}")
           else
-            output("class #{node.constant_path.name} < #{node.superclass.name}")
+            paths = parse_constant_path(node.superclass)
+            output("class #{node.constant_path.name} < #{paths.join('::')}")
           end
         else
           output("class #{node.constant_path.name}")
@@ -133,8 +143,16 @@ module Yard2rbs
         end
 
         if (kw_rest_arg = node.parameters&.keyword_rest)
-          type = format_types(types[:params][kw_rest_arg.name.to_s])
-          params << "**#{type}"
+          case kw_rest_arg
+          when Prism::ForwardingParameterNode
+            params_type = format_types(types[:params]['...'])
+            params << "*#{params_type}"
+            params << "**#{params_type}"
+            block = '?{ (?) -> untyped }'
+          else
+            type = format_types(types[:params][kw_rest_arg.name.to_s])
+            params << "**#{type}"
+          end
         end
 
         if node.parameters&.block
@@ -190,7 +208,10 @@ module Yard2rbs
           if node.arguments
             receiver = 'self.' if self?(node)
             node.arguments.arguments.each do |arg|
-              output("#{receiver}#{node.name} #{arg.name}")
+              paths = parse_constant_path(arg)
+              next if paths.none?
+
+              output("#{receiver}#{node.name} #{paths.join('::')}")
             end
           end
 
@@ -215,13 +236,6 @@ module Yard2rbs
         process(node.compact_child_nodes)
       end
 
-      true
-    end
-
-    # @param output [String]
-    # @return [true]
-    def validate(output)
-      RBS::Parser.parse_signature(output)
       true
     end
 
@@ -257,6 +271,23 @@ module Yard2rbs
       else
         "#{types.first}#{'?' if nilable}"
       end
+    end
+
+    # @param node [Prism::Node]
+    # @param paths [Array<Symbol>]
+    # @return [Array<Symbol>]
+    def parse_constant_path(node, paths = [])
+      return paths unless node
+
+      case node
+      when Prism::ConstantPathNode
+        parse_constant_path(node.parent, paths)
+        paths << node.name
+      when Prism::ConstantReadNode
+        paths << node.name
+      end
+
+      paths
     end
   end
 end

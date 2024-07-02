@@ -11,6 +11,7 @@ class Sample
   def greet9: (first_name: String, last_name: String, ?greeting: String) -> String
   def greet10: (**String) -> Array[String]
   def greet11: (String first_name, String last_name, String greeting) { (String greeting) -> String } -> String
+  def greet12: (*String, **String) ?{ (?) -> untyped } -> String
   private def private_greeting: () -> String
   private
   def private_greet: (String name) -> String

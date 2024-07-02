@@ -82,6 +82,12 @@ class Sample
     yield("#{greeting} #{first_name} #{last_name}")
   end
 
+  # @param ... [String]
+  # @return [String]
+  def self.greet12(...)
+    greet11(...)
+  end
+
   # @return [String]
   private_class_method def self.private_greeting
     'Yo'

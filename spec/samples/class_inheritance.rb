@@ -28,4 +28,11 @@ class Sample
       'Hello'
     end
   end
+
+  class ManagerAdmin < User::Admin
+    # @return [String]
+    def greeting
+      'Hello'
+    end
+  end
 end

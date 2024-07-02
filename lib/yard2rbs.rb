@@ -12,8 +12,18 @@ module Yard2rbs
     # @return [Boolean]
     def convert(file_paths)
       file_paths.each do |file_path|
-        output = Converter.convert(file_path)
+        output = Converter.convert(file_path, validate: false)
         next if output.empty?
+
+        begin
+          Converter.validate(output)
+        rescue RBS::ParsingError => e
+          puts file_path
+          puts e.inspect
+          puts output
+          puts
+          next
+        end
 
         output_path = sig_path_for(file_path)
         output_dirname = File.dirname(output_path)

@@ -11,4 +11,7 @@ class Sample
   class Manager < User
     def greeting: () -> String
   end
+  class ManagerAdmin < User::Admin
+    def greeting: () -> String
+  end
 end
