@@ -7,5 +7,4 @@ target :app do
   library 'prism'
   library 'rbs'
   library 'fileutils'
-  library 'listen'
 end
